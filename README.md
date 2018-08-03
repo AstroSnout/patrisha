@@ -23,5 +23,5 @@ These are structured in the following format:
 *!guild unsub <realm-name> <guild-name>* - unsubscribes you from the service mentioned above  
 *!m \[a, aff, affix, affixes] <region=eu>* - shows this week's mythic plus affixes  
 *!m \[f, first, b, best] <realm-name> <dungeon-name=all>* - shows the top run of a dungeon on realm (defaults to showing all runs)  
-*!m \[l, last, w, worst] <realm-name> <dungeon-name=all>* - shows the last run of a dungeon on realm (useful for r.io score) 
+*!m \[l, last, w, worst] <realm-name> <dungeon-name=all>* - shows the last run of a dungeon on realm (useful for r.io score)  
 *!m \[p, profile, rio] <character-name> <realm-name> <region=eu>* - shows useful mythic plus related info on a character
