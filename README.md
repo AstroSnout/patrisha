@@ -24,4 +24,24 @@ These are structured in the following format:
 *!m \[a, aff, affix, affixes] <region=eu>* - shows this week's mythic plus affixes  
 *!m \[f, first, b, best] <realm-name> <dungeon-name=all>* - shows the top run of a dungeon on realm (defaults to showing all runs)  
 *!m \[l, last, w, worst] <realm-name> <dungeon-name=all>* - shows the last run of a dungeon on realm (useful for r.io score)  
-*!m \[p, profile, rio] <character-name> <realm-name> <region=eu>* - shows useful mythic plus related info on a character
+*!m \[p, profile, rio] <character-name> <realm-name> <region=eu>* - shows useful mythic plus related info on a character  
+*!token <region=eu>* - shows the current token price (valid regions are EU, US, KR and TW)  
+
+## Games:
+*!droll <dice>* - roll a die in {number of dies}d{sides on the die} (3d6 for example would roll a 6-sided die 3 times)  
+*!roll <range_down=1> <range_up=100>* - roll between 1 and 100, 1 and number1 or number1 and number2  
+
+## Music:
+*!\[p, play, stream] <url or song name>* - play a song from a given URL or takes the first result of a search of a given name  
+*!\[que, queue]* - shows all queued songs  
+*!\[stop, dc, disconnect]* - stops playing music and disconnects from the channel  
+*!skip* - stops playing the current song and plays the next one in que  
+
+## Stats:
+*!stats post <amount=400>* - shows the most popular post (judging by total reacts) going back a specified amount of messages  
+*!stats poster <amount=400>* - ranks members by total reacts on posts looking at the last specified amount of messages  
+
+## Misc:
+*!help <command-name=None>* - lists all commands or shows detailed information on a command  
+*!feedback <your-feedback>* - use this to send me suggestions and bugs  
+*!invitelink* - gives you a link you can use to invite Patrisha to your server
