@@ -6,11 +6,10 @@
 
 # List of available commands
 
-These are structured in the following format:
-
+These are structured in the following format:  
 !{subgroup (if available)} \[alias1, alias2...] <argument 1> <argument 2> <optional_argument=default value> 
 
 **Economy sub-group:**
-!eco balance | !eco b | !eco bal - Takes no argument, shows your current currency balance
-!eco register | !eco r | !eco reg - Takes no argument, registers the author to the bank
-!eco work | !eco w
+!eco balance | !eco b | !eco bal - Takes no argument, shows your current currency balance  
+!eco register | !eco r | !eco reg - Takes no argument, registers the author to the bank  
+!eco work | !eco w  
