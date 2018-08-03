@@ -7,6 +7,7 @@
 # List of available commands
 
 These are structured in the following format:
+
 !{subgroup (if available)} \[alias1, alias2...] <argument 1> <argument 2> <optional_argument=default value> 
 
 **Economy sub-group:**
