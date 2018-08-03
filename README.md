@@ -4,20 +4,20 @@
 
 *If you have any feedback and/or suggestions, DM me at Trishma#6911 over on Discord.*
 
-## List of available commands
+# List of available commands
 
 These are structured in the following format:  
 !{subgroup (if available)} \[alias1, alias2...] <argument 1> <argument 2> <optional_argument=default value> 
 
-### Economy Cog
-!eco \[b, bal, balance] - shows your current currency balance  
-!eco \[r, reg, register] - registers the author to the bank  
-!eco \[w, work] - earns you currency (command has a set cooldown)  
+## Economy Cog:
+*!eco \[b, bal, balance]* - shows your current currency balance  
+*!eco \[r, reg, register]* - registers the author to the bank  
+*!eco \[w, work]* - earns you currency (command has a set cooldown)  
 
-**Gambling Cog:**  
-!slot <bet-amount> - rolls a virtual slot machine (use !help slot to see the pay table)  
+## Gambling Cog:
+*!slot <bet-amount>* - rolls a virtual slot machine (use !help slot to see the pay table)  
 
-**World of Warcraft Cog:**  
+## World of Warcraft Cog:
 !guild ss <import-string> - creates a spreadsheet from a given string (from EventExport add-on)  
 !guild sub <realm-name> <guild-name> - Patrisha will DM you any members that join/leave the guild  
 !guild unsub <realm-name> <guild-name> - unsubscribes you from the service mentioned above  
