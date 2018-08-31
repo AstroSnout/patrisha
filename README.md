@@ -9,6 +9,8 @@
 These are structured in the following format:  
 !{subgroup (if available)} \[alias1, alias2...] <argument 1> <argument 2> <optional_argument=default value> 
 
+*Some commands that were added on Aug 31st are not listed in the docs *
+
 ## Economy Cog:
 *!eco \[b, bal, balance]* - shows your current currency balance  
 *!eco \[r, reg, register]* - registers the author to the bank  
