@@ -22,6 +22,7 @@ class Gamble:
 
     @commands.command(name='slot', help=slot_help)
     async def gamble_slot(self, ctx, amount: int):
+        print(f'{ctx.message.author} requested to gamble on the slot machine for {amount} money')
         reel1_weights = [4, 5, 6, 6, 7, 8, 28]
         reel2_weights = [3, 4, 4, 5, 5, 6, 37]
         reel3_weights = [1, 2, 3, 4, 6, 6, 42]

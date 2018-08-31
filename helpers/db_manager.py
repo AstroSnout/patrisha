@@ -17,6 +17,7 @@ class DBManager():
         self.db_eco = self.economy_cl['economy']
         self.db_guild = self.guild_cl['guilds']
 
+        self.server_settings = self.db_token['guild_settings']  # discord servers
         self.balance = self.db_eco['balance']
 
     async def update_guild_db(self, guild_name, realm_name, members):
@@ -125,3 +126,52 @@ class DBManager():
             return None
         else:
             return user['balance']
+
+    async def create_settings_if_none(self, server):
+        settings = await self.server_settings.find_one({'id': server.id})
+        if settings is None:
+            await self.server_settings.insert_one({
+                'id': server.id,
+                'name': server.name,
+                'on_join_message': None,
+                'on_leave_message': None,
+                'on_join_role': None,
+            })
+
+    async def modify_on_join_message(self, message, server):
+        result = await self.server_settings.update_one(
+            {'id': server.id},
+            {'$set':
+                {
+                    'on_join_message': message
+                }
+            }
+        )
+        print(result)
+
+    async def modify_on_join_role(self, role_name, server):
+        if role_name:
+            for role in server.roles:
+                if role.name.lower() == role_name.lower():  # Case insensitive
+                    # Found the role, update
+                    result = await self.server_settings.update_one(
+                        {'id': server.id},
+                        {'$set':
+                            {
+                                'on_join_role': role_name
+                            }
+                        }
+                    )
+                    print(result)
+                    return True  # Success
+            return False  # Failed
+
+    async def get_server_message(self, server):
+        settings = await self.server_settings.find_one({'id': server.id})
+        if settings:
+            return settings['on_join_message']
+
+    async def get_server_role(self, server):
+        settings = await self.server_settings.find_one({'id': server.id})
+        if settings:
+            return settings['on_join_role']

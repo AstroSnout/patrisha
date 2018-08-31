@@ -6,7 +6,7 @@ import asyncio
 class Helper(HelpFormatter):
     def __init__(self):
         super(Helper, self).__init__()
-        print('Initiated Helper class')
+        self.category = ''
 
     def _add_subcommands_to_page(self, max_width, commands):
         for name, command in commands:
@@ -17,7 +17,6 @@ class Helper(HelpFormatter):
             entry = '`!{0:<{width}}` - {1}'.format(name, command.short_doc, width=max_width)
             shortened = self.shorten(entry)
             self._paginator.add_line(shortened)
-
 
     @asyncio.coroutine
     def format(self):

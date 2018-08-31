@@ -14,29 +14,36 @@ class Stats:
 
     @stats.command(name='post', help="Get the best post (according to total number of reacts received)")
     async def stats_post(self, ctx, limit=400):
+        print(f'{ctx.message.author} requested the most popular post in the last {limit} messages')
         # Makes a list of {message:Message, reacts:int} dicts from channel history
         messages=[{'message': message, 'reacts': sum(react.count for react in message.reactions)} async for message in ctx.channel.history(limit=limit)]
         # Sorts the list in descending order
         sorted_mess = sorted(messages, key=lambda k: k['reacts'], reverse=True)
         # Get the top rated post
         top_msg, reacts = sorted_mess.pop(0).values()
+        try:
+            name = top_msg.author.nick
+        except:
+            name = top_msg.author.name
         # Print out the result (with attachments if present)
         if top_msg.attachments:
+
             await ctx.send('User {} has the most popular post: {} {} with {} reacts'.format(
-                top_msg.author.nick,
+                name,
                 top_msg.content,
                 top_msg.attachments[0].url,
                 reacts)
             )
         else:
             await ctx.send('User {} has the most popular post: {} with {} reacts'.format(
-                top_msg.author.nick,
+                name,
                 top_msg.content,
                 reacts)
             )
 
     @stats.command(name='poster', help='Get the best poster (according to total number of reacts received)')
     async def stats_poster(self, ctx, limit=400):
+        print(f'{ctx.message.author} requested the most popular poster in the last {limit} messages')
         # Makes a list of {message:Message, reacts:int} dicts from channel history
         messages = [{'message': message, 'reacts': sum(react.count for react in message.reactions)} async for message in ctx.channel.history(limit=limit)]
         # Get total reacts for every user that posted in the channel
