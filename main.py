@@ -6,6 +6,7 @@ import traceback
 import asyncio
 import time
 import datetime
+import youtube_dl
 
 from helpers import cfg, bg_tasks, misc
 from helpers.db_manager import DBManager
@@ -128,16 +129,19 @@ async def on_member_join(member):
 async def on_command_error(ctx, error):
     print(ctx, error)
     await me.send(f'{ctx.message.content} caused an error:\n{error}')  # DMs me
+
+    if 'Signature extraction failed' in str(error):
+        await ctx.send('YouTube probably pushed an update that broke something :(')
     if 'ffmpeg was not found' in str(error):
         await ctx.send(f'My magnificent creator forgot to give me ffmpeg :)')
     if isinstance(error, discord.errors.Forbidden):
         await ctx.send(f'I am missing the required permissions to do this command')
     if isinstance(error, commands.errors.CommandOnCooldown):
-        time_str = time.strftime("%H:%M:%S", time.gmtime(int(error.retry_after)))
-        await ctx.send(f'You are on cooldown. Try again in {time_str}')
+        # time_str = time.strftime("%H:%M:%S", time.gmtime(int(error.retry_after)))
+        await ctx.send(f'You are on cooldown. Try again in {str(error.retry_after)[:4]}s')
     if isinstance(error, commands.errors.MissingRequiredArgument):
-        await ctx.send(f'I need more information in order to do that command :/\n'
-                       f'Try running `!help {ctx.message.content.replace("!","")}`')
+        await ctx.send(f':x: I need more information in order to do that command!\n'
+                       f'Try running `!help <command name>`')
 
 
 bot.loop.create_task(background_tasks())
