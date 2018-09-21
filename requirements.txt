@@ -5,3 +5,5 @@ motor
 yarl
 youtube_dl
 xlsxwriter
+bs4
+requests
