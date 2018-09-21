@@ -120,8 +120,24 @@ class Administration:
             #     if msg.author.id == user or msg.author.nick.lower() == user or user is None:
             #         print(msg)
 
-        if user is None or ctx.message.author.id == user or ctx.message.author.nick == user:
-            messages.pop(-1)
+        if '--message' in args or '-msg' in args:
+            msg = None
+            if '-msg' in args:
+                try:
+                    msg = args[args.index('-msg') + 1]  # next argument should be the user
+                except:
+                    await ctx.invoke(self.bot.get_command('help'), 'a', 'p')
+                    return
+            elif '--message' in args:
+                try:
+                    msg = args[args.index('--message') + 1]  # next argument should be the user
+                except:
+                    await ctx.invoke(self.bot.get_command('help'), 'a', 'p')
+                    return
+
+        # if user is None or ctx.message.author.id == user or ctx.message.author.nick == user:
+        #     messages.pop(-1)
+
         total = await self._delete_messages(ctx, messages)
 
         stats = discord.Embed(
@@ -136,7 +152,10 @@ class Administration:
             inline=False
         )
 
-        await ctx.send(embed=stats)
+        try:
+            await ctx.send(msg, embed=stats)
+        except:
+            await ctx.send(embed=stats)
 
 
 def setup(bot):

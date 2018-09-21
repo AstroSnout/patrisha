@@ -21,36 +21,41 @@ class GameWow:
             'healer': 'https://vignette.wikia.nocookie.net/wowwiki/images/0/07/Icon-class-role-healer-42x42.png',
             'dps': 'https://vignette.wikia.nocookie.net/wowwiki/images/3/3f/Icon-class-role-dealer-42x42.png'
         }
+        self.dungeon_names = [
+            'Atal\'dazar',
+            'Freehold',
+            'Tol Dagor',
+            'The MOTHERLODE!!',
+            'Waycrest Manor',
+            'Kings\' Rest',
+            'Temple of Sethraliss',
+            'The Underrot',
+            'Shrine of the Storm',
+            'Siege of Boralus'
+        ]
         self.name_to_abr = {
-            'Black Rook Hold': 'BRH',
-            'Cathedral of Eternal Night': 'CoEN',
-            'Court of Stars': 'CoS',
-            'Darkheart Thicket': 'DHT',
-            'Eye of Azshara': 'EoA',
-            'Halls of Valor': 'HoV',
-            'Maw of Souls': 'MoS',
-            'Neltharion\'s Lair': 'NL',
-            'Return to Karazhan: Lower': 'LOWR',
-            'Return to Karazhan: Upper': 'UPPR',
-            'Seat of the Triumvirate': 'SEAT',
-            'The Arcway': 'Arc',
-            'Vault of the Wardens': 'VotW'
+            'Atal\'dazar': 'AD',
+            'Freehold': 'FH',
+            'Tol Dagor': 'TD',
+            'The MOTHERLODE!!': 'ML',
+            'Waycrest Manor': 'WM',
+            'Kings\' Rest': 'KR',
+            'Temple of Sethraliss': 'ToS',
+            'The Underrot': 'UNDR',
+            'Shrine of the Storm': 'SotS',
+            'Siege of Boralus': 'Siege',
         }
         self.abr_to_name = {
-            'brh'   :   'Black Rook Hold',
-            'coen'  :   'Cathedral of Eternal Night',
-            'cos'   :   'Court of Stars',
-            'dht'   :   'Darkheart Thicket',
-            'eoa'   :   'Eye of Azshara',
-            'hov'   :   'Halls of Valor',
-            'mos'   :   'Maw of Souls',
-            'nl'    :   'Neltharion\'s Lair',
-            'lower' :   'Return to Karazhan: Lower',
-            'upper' :   'Return to Karazhan: Upper',
-            'seat'  :   'Seat of the Triumvirate',
-            'arc'   :   'The Arcway',
-            'vault' :   'Vault of the Wardens',
-            'votw'  :   'Vault of the Wardens'
+            'ad'   : 'Atal\'dazar',
+            'fh'   : 'Freehold',
+            'td'   : 'Tol Dagor',
+            'ml'   : 'The MOTHERLODE!!',
+            'wm'   : 'Waycrest Manor',
+            'kr'   : 'Kings\' Rest',
+            'tos'  : 'Temple of Sethraliss',
+            'undr' : 'The Underrot',
+            'sots' : 'Shrine of the Storm',
+            'siege': 'Siege of Boralus'
         }
         self.specs = {
             '250': 'Blood DK',
@@ -104,7 +109,7 @@ class GameWow:
             'Mistweaver Monk': 'healer',
             'Restoration Druid': 'healer'
         }
-        self.dng_abr = ['brh', 'coen', 'cos', 'dht', 'eoa', 'hov', 'mos', 'nl', 'lower', 'upper', 'seat', 'arc', 'vault', 'votw']
+        self.dng_abr = ['ad', 'fh', 'td', 'ml', 'wm', 'kr', 'tos', 'undr', 'sots', 'siege']
         self.token = cfg.BNET_ACCESS_TOKEN
         self.api_key = cfg.BNET_API_KEY
         self.db_manager = DBManager()
@@ -154,28 +159,20 @@ class GameWow:
         async with ctx.typing():
             # Print the requester and command invoked, for logging purposes
             print(f'{ctx.message.author} requested M+ score for {char_name}-{realm}')
-            # Request mythic scores
-            m_score = await u.get_json(
-                routes.raider_io.mythic_score(char_name, realm, region)
+            # Request all character data we need
+            character_data = await u.get_json(
+                routes.raider_io.all_character_data(char_name, realm, region)
             )
             # When the request fails for whatever reason
-            if 'message' in m_score.keys():
-                await ctx.send(m_score['message'])
-                return
-            # Request recent runs
-            recent = await u.get_json(
-                routes.raider_io.recent_runs(char_name, realm, region)
-            )
-            # When the request fails for whatever reason
-            if 'message' in recent.keys():
-                await ctx.send(recent['message'])
+            if 'message' in character_data.keys():
+                await ctx.send(character_data['message'])
                 return
 
             # Assign new variables for increased readability
-            m_score_total = m_score['mythic_plus_scores'].pop('all', None)
+            m_score_total = character_data['mythic_plus_scores'].pop('all', None)
             # Assign variable for increased readability
-            recent_runs = recent['mythic_plus_recent_runs']
-            role = max(m_score['mythic_plus_scores'].items(), key=operator.itemgetter(1))[0]  # Role with best score
+            recent_runs = character_data['mythic_plus_recent_runs']
+            role = max(character_data['mythic_plus_scores'].items(), key=operator.itemgetter(1))[0]  # Role with best score
             # Request top dungeon runs (currently the r.io API only returns the top 3)
             character = await u.get_json(
                 routes.raider_io.character_profile(char_name, realm, region)
@@ -195,7 +192,9 @@ class GameWow:
                 icon_url=self.role_icons[role]
             )
             # Set their mythic plus score field to the obtained value
-            embed.add_field(name='Mythic+ Score:', value='({} points)'.format(m_score_total), inline=False)
+            embed.add_field(name='Mythic+ Score:', value='({} points)'.format(m_score_total), inline=True)
+            # Show their equipped itemlevel
+            embed.add_field(name='Equipped iLvl:', value=character_data['gear']['item_level_equipped'], inline=True)
             # Assign new variable for increased readability
             best_runs = character['mythic_plus_best_runs']
             # Add a field to the embed for every run the API returned (that's 3 most of the time)
@@ -254,7 +253,7 @@ class GameWow:
         await ctx.send(embed=embed)
 
     @m.command(name='last', aliases=['worst', 'l', 'w'], help='See what the last (most of the time 500th) run is on the official leaderboards')
-    async def m_last(self, ctx, realm, *, dungeon: str = 'all'):
+    async def m_last(self, ctx, realm: str, *, dungeon: str = 'all'):
         async with ctx.typing():
             print(f'{ctx.message.author} requested last dungeon({dungeon}) on realm({realm})')
             # Request realm info
@@ -268,19 +267,19 @@ class GameWow:
             if dungeon.lower() == 'all':
                 await self.m_last_all(ctx, realm_id, realm_name)
                 return
-            # Makes lowercase names from our translation dict
-            full_names_lower = list(map(str.lower, list(self.abr_to_name.values())))
+            # Makes lowercase names from our list
+            lowercase_dungeons = list(map(str.lower, self.dungeon_names))
             # The following statements enable partial and abbreviated input (i.e. 'eoa or 'eye' for Eye of Azshara)
             dungeon_name = ''
             # See if the name is possibly abbreviated (i.e. 'eoa' for 'Eye of Azshara')
             if dungeon.lower() in self.dng_abr:
                 dungeon_name = self.abr_to_name[dungeon.lower()]
             # See if it's actually full dungeon name
-            elif dungeon.lower() in full_names_lower:
+            elif dungeon.lower() in lowercase_dungeons:
                 dungeon_name = dungeon
             # See if it's a partial match (i.e. 'eye' for 'Eye of Azshara')
             else:
-                for item in full_names_lower:
+                for item in lowercase_dungeons:
                     if dungeon.lower() in item:
                         dungeon_name = item.title()
                         break
@@ -326,7 +325,7 @@ class GameWow:
             await ctx.send(embed=embed)
 
     @m.command(name='first', aliases=['best', 'f', 'b'], help='See what the best run is on the official leaderboards')
-    async def m_first(self, ctx, realm, *, dungeon: str = 'all'):
+    async def m_first(self, ctx, realm: str, *, dungeon: str = 'all'):
         async with ctx.typing():
             print(f'{ctx.message.author} requested first dungeon({dungeon}) on realm({realm})')
             # Request realm info
@@ -341,18 +340,18 @@ class GameWow:
                 await self.m_first_all(ctx, realm_id, realm_name)
                 return
             # Makes lowercase names from our translation dict
-            full_names_lower = list(map(str.lower, list(self.abr_to_name.values())))
+            lowercase_dungeons = list(map(str.lower, self.dungeon_names))
             # The following statements enable partial and abbreviated input (i.e. 'eoa or 'eye' for Eye of Azshara)
             dungeon_name = ''
             # See if the name is possibly abbreviated (i.e. 'eoa' for 'Eye of Azshara')
             if dungeon.lower() in self.dng_abr:
                 dungeon_name = self.abr_to_name[dungeon.lower()]
             # See if it's actually full dungeon name
-            elif dungeon.lower() in full_names_lower:
+            elif dungeon.lower() in lowercase_dungeons:
                 dungeon_name = dungeon
             # See if it's a partial match (i.e. 'eye' for 'Eye of Azshara')
             else:
-                for item in full_names_lower:
+                for item in lowercase_dungeons:
                     if dungeon.lower() in item:
                         dungeon_name = item.title()
                         break
@@ -503,46 +502,6 @@ class GameWow:
         else:
             await ctx.send('You are not subbed to that guild')
 
-    @guild.command(name='ss', help='Processes import string from the Add-on to form a spreadsheet')
-    async def guild_ss_from_string(self, ctx, *import_string):
-        '''
-        inviteexport = type 0
-        eeonline = type 1
-        eeall = type 2
-        '''
-        if ctx.message.attachments:
-            file = ctx.message.attachments[0]  # Expecting only one attachment
-            async with ctx.typing():
-                print(f'{ctx.message.author} requested a spreadsheet parse with import file: {file.filename}')
-                # Prepare string for parsing
-                await file.save('tempfile.txt')
-                with open('tempfile.txt', 'rb') as openfile:
-                    importstring = openfile.readlines()
-                    read_data = [line.decode('utf_8') for line in importstring][0]
-        else:
-            print(f'{ctx.message.author} requested a spreadsheet parse with import: {import_string}')
-            read_data = import_string[0]
-
-        async with ctx.typing():
-            try:
-                decoded_data = b64.b64decode(read_data)
-            except ValueError:
-                await ctx.send('Invalid input string')
-                return
-
-            data = json.loads(decoded_data)
-            print(data)
-            if data['stringType']:
-                data_type = data['stringType']
-                del data['stringType']
-            else:
-                await ctx.send('Invalid JSON received :S')
-                return
-
-            spreadsheet = self.ss_maker.make_spreadsheet(data_type, data)
-            # Send the file back
-            await ctx.send(file=discord.File(spreadsheet))
-
     @commands.command(name='token', help='See the current token price (EU/US/KR/TW)')
     async def tok(self, ctx, region: str = 'EU'):
         async with ctx.typing():
@@ -568,11 +527,12 @@ class GameWow:
             # Time formatting is hard
             last_updated = datetime.datetime.utcfromtimestamp(current_token_json['last_updated'] / 1000 + 7200).strftime(
                 '%B %d, %Y at %H:%M:%S')
-            await ctx.send('Current **{0}** token price: **{1}g** \n_Last updated: {2} GMT+1_'
+            await ctx.send('Current **{0}** token price: **{1} {3}** \n_Last updated: {2} GMT+1_'
                            .format(
                                 region.upper(),
                                 current_token_json['price'],
-                                last_updated
+                                last_updated,
+                                u.get_emoji('goldcoins')
                            ))
 
     async def m_last_all(self, ctx, realm_id, realm_name):
