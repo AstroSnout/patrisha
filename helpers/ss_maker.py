@@ -88,7 +88,7 @@ class Spreadsheets:
             ws.write('D2', ' ', fill)
 
             # Populate the rows
-            for i in range(1, len(data)):
+            for i in range(1, len(data)+1):
                 i = str(i)
                 # Assign variables for increased readability
                 invite_status = self.invite_status[data[i]['inviteStatus']]
@@ -104,10 +104,10 @@ class Spreadsheets:
                 ws.write(f'D{str(i+2)}', ' ', fill)
 
             # Close the sheet
-            ws.write(f'A{len(data)+2}', ' ', fill)
-            ws.write(f'B{len(data)+2}', ' ', fill)
-            ws.write(f'C{len(data)+2}', ' ', fill)
-            ws.write(f'D{len(data)+2}', ' ', fill)
+            ws.write(f'A{len(data)+3}', ' ', fill)
+            ws.write(f'B{len(data)+3}', ' ', fill)
+            ws.write(f'C{len(data)+3}', ' ', fill)
+            ws.write(f'D{len(data)+3}', ' ', fill)
 
             wb.close()
 
@@ -141,9 +141,9 @@ class Spreadsheets:
             for i in range(len(all_online)):
                 char_name = all_online[i]
 
-                ws.write(f'B{i+3}', ' ', fill)
+                ws.write(f'A{i+3}', ' ', fill)
                 ws.write(f'B{i+3}', char_name, body)
-                ws.write(f'B{i+3}', ' ', fill)
+                ws.write(f'C{i+3}', ' ', fill)
 
             # Close the sheet
             ws.write(f'A{len(all_online)+3}', ' ', fill)
@@ -180,7 +180,7 @@ class Spreadsheets:
             ws.write('E2', ' ', fill)
 
             # Populate the rows
-            for i in range(1, len(data)):
+            for i in range(1, len(data)+1):
                 i = str(i)
                 char_name = data[i]['name']
                 try:
@@ -200,11 +200,11 @@ class Spreadsheets:
                 ws.write(f'D{str(i+2)}', officer_note, body)
                 ws.write(f'E{str(i+2)}', ' ', fill)
 
-            ws.write(f'A{len(data)+2}', ' ', fill)
-            ws.write(f'B{len(data)+2}', ' ', fill)
-            ws.write(f'C{len(data)+2}', ' ', fill)
-            ws.write(f'D{len(data)+2}', ' ', fill)
-            ws.write(f'E{len(data)+2}', ' ', fill)
+            ws.write(f'A{len(data)+3}', ' ', fill)
+            ws.write(f'B{len(data)+3}', ' ', fill)
+            ws.write(f'C{len(data)+3}', ' ', fill)
+            ws.write(f'D{len(data)+3}', ' ', fill)
+            ws.write(f'E{len(data)+3}', ' ', fill)
 
             # Close the sheet
             wb.close()

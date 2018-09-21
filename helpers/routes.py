@@ -58,6 +58,15 @@ class RaiderIORoutes():
                 character_name
             )
 
+    @staticmethod
+    def all_character_data(character_name, realm, region='eu'):
+        return 'https://raider.io/api/v1/characters/profile?region={0}&realm={1}&name={2}&fields=gear%2Cmythic_plus_scores%2Cmythic_plus_recent_runs'\
+            .format(
+                region,
+                realm,
+                character_name
+            )
+
 
 blizzard = BlizzardRoutes(cfg.BNET_ACCESS_TOKEN, cfg.BNET_API_KEY)
 raider_io = RaiderIORoutes()

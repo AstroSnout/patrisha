@@ -3,18 +3,22 @@ import yarl
 import json
 from helpers import cfg
 
+emojis = {
+    'goldcoins': '<:goldcoins:487736737485946880>',
+    'youtube'  : '<:youtube:487738563379593218>',
+
+}
+
+
+def get_emoji(name):
+    return emojis[name]
+
 
 async def get_json(uri, timeout=60):
     print('Requesting JSON ->', yarl.URL(uri))
     async with aiohttp.ClientSession() as session:
         async with session.get(str(yarl.URL(uri)), timeout=timeout) as json_request:
             return json.loads(await json_request.text())
-
-
-async def get_discord_user_by_id(user_id, client):
-    for user in client.get_all_members():
-        if user.id == user_id:
-            return user  # discord.User
 
 
 async def get_guild_roster(realm_name, guild_name):
