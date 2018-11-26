@@ -1,9 +1,9 @@
 git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py[voice]
 pip
 aiohttp
-motor
 yarl
+motor
 youtube_dl
 xlsxwriter
-bs4
+bs4 
 requests
