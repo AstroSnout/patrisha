@@ -17,7 +17,7 @@ from helpers import util as u
 youtube_dl.utils.bug_reports_message = lambda: ''
 
 ytdl_format_options = {
-    'format': 'worstaudio/worst',
+    'format': 'bestaudio/best',
     'outtmpl': 'dl/%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
@@ -77,18 +77,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
             views=data['view_count']
         )
         return song
-
-    @classmethod
-    def get_playlist_links(cls, user_link):
-        # Meme one-liner
-        # So, this gets the page, finds all <a> elements
-        # then find hrefs in those elements and then within those
-        # hrefs, filters out the /watch ones (duplicates handled with set())
-        # and once that's done, appends 'youtube.com' to the result and
-        # removes everything after the '&' in watch link
-        return set(['youtube.com' + href.split('&')[0] for link in
-                    bs4.BeautifulSoup(requests.get(user_link).content, 'html.parser').find_all('a') for href in
-                    link.get('href').split('\n') if 'watch' in href])
 
     @classmethod
     def download(cls, url):
@@ -217,7 +205,7 @@ class Music(commands.Cog):
     # Notifies users that it finished playing and leaves voice channel
     async def _finished_playing(self, ctx):
         self.now_playing = None
-        self._clear_que(ctx.guild.id)
+        await self._clear_que(ctx.guild.id)
         await ctx.send(f':x: Finished playing, leaving **__{ctx.author.voice.channel.name}__**!')
         await ctx.voice_client.disconnect()
 
@@ -258,67 +246,29 @@ class Music(commands.Cog):
     @commands.command(name='play', aliases=['p', 'stream'],help='Plays a song from YouTube - You can use URLs or song names (picks the first result)')
     async def play(self, ctx, *, url):
         # @play.before_invoke functions below - ensure_voice()
-        playlist = False
         msg = await ctx.send(f'{u.get_emoji("youtube")}:mag_right: Searching...')
-        '''------------- String formatting the input -------------'''
-        # Check if it's a playlist
-        if 'playlist?list=' in url:
-            all_songs = [song for song in YTDLSource.get_playlist_links(url)]
-            playlist = True
-        # Check if it's a link
-        elif 'https://' in url:
-            # Check if shorthand
-            if 'youtu.be' in url:
-                url = url.split('youtu.be/')[1]
-                print('youtu.be id - ', url)
-            # This should be the full link
-            else:
-                temp = url.split('&')[0]
-                url = temp.replace('https://www.youtube.com/watch?v=', '')
-                print(url)
+        # Bot is not connected to voice (probably redundant due to ensure_voice func below)
+        if not ctx.voice_client:
+            await ctx.send(f'Bot is not connected to a channel :(')
 
-        # Bot is connected (probably redundant due to ensure_voice func below)
-        if ctx.voice_client:
-            url = url.replace(':', '')  # semi-colon breaks this for whatever reason
-            # Get filename and song title
-            if playlist:
-                async with ctx.typing():
-                    for playlist_song in all_songs:
-                        # Get all the song metadata
-                        song = await YTDLSource.song_name(playlist_song, ctx, loop=self.bot.loop)
-                        # Add the song to the que instantly
-                        self.song_queue[song.sid].append(song)
-                        if len(self.song_queue[song.sid]) < 2:
-                            for song in self.song_queue[song.sid]:
-                                if not os.path.exists(f'{song.filename}'):
-                                    threading.Thread(target=YTDLSource.download, args=(song.title,)).start()
-                                    print(f'Downloaded {song.title}')
-                        # Play if nothing is playing while we do stuff in the background
-                        if not ctx.voice_client.is_playing() and playlist_song == all_songs[0]:
-                            self.now_playing = song
-                            await self._play_song(
-                                self.song_queue[song.sid].pop(0)
-                            )
-                            await msg.delete()
-                    await ctx.send(f'Your playlist has been queued\n')
-            else:
-                async with ctx.typing():
-                    song = await YTDLSource.song_name(url, ctx, loop=self.bot.loop)
+        url = url.replace(':', '')  # semi-colon breaks this for whatever reason
+        async with ctx.typing():
+            song = await YTDLSource.song_name(url, ctx, loop=self.bot.loop)
 
-                    if not ctx.voice_client.is_playing():
-                        self.now_playing = song
-                        await self._play_song(song)
-                        await msg.delete()
-                    else:
-                        # Download if not available locally
-                        if not os.path.exists(f'{song.filename}'):
-                            threading.Thread(target=YTDLSource.download, args=(url,)).start()
-                            print(f'Downloaded {song.title}')
-                        # Add to que
-                        self.song_queue[song.sid].append(song)  # Tries to append
-                        # Inform the invoker
-                        await msg.delete()
-                        await ctx.send(embed=await song.make_embed_queued(self.song_queue[song.sid]))
+            if not ctx.voice_client.is_playing():
+                self.now_playing = song
+                await self._play_song(song)
+                await msg.delete()
+            else:
+                # Download if not available locally
+                if not os.path.exists(f'{song.filename}'):
+                    threading.Thread(target=YTDLSource.download, args=(url,)).start()
+                    print(f'Downloaded {song.title}')
+                # Add to que
+                self.song_queue[song.sid].append(song)  # Tries to append
+                # Inform the invoker
+                await msg.delete()
+                await ctx.send(embed=await song.make_embed_queued(self.song_queue[song.sid]))
 
     @commands.cooldown(rate=1, per=3, type=BucketType.user)
     @commands.command(name='stop', aliases=['disconnect', 'dc'], help='Stops the music and disconnects the bot from the voice channel')
@@ -390,7 +340,6 @@ class Music(commands.Cog):
                 raise commands.CommandError("Author not connected to a voice channel.")
 
         print('Ensured voice')
-
 
 
 def setup(bot):

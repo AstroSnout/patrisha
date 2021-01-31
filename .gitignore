@@ -1,6 +1,10 @@
 # Project specific
 settings.ini
 venv/
+dl/
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
