@@ -1,17 +1,19 @@
-from helpers import cfg, util
+from helpers import util
+import configparser
 
 
-class BlizzardRoutes():
-    def __init__(self, blizz_access_token, blizz_api_key):
-        self.token = blizz_access_token
-        self.api_key = blizz_api_key
+class BlizzardRoutes:
+    settings = configparser.ConfigParser()
+    settings.read('./settings.ini')
+    token = settings['blizzard']['client_secret']
+    api_key = settings['blizzard']['api_key']
 
     @staticmethod
     def realm(realm):
         return 'https://eu.api.battle.net/data/wow/realm/{0}?namespace=dynamic-eu&locale=en_GB&access_token={1}'\
             .format(
                 realm,
-                cfg.BNET_ACCESS_TOKEN
+                BlizzardRoutes.token
             )
 
     @staticmethod
@@ -19,7 +21,7 @@ class BlizzardRoutes():
         return 'https://eu.api.battle.net/data/wow/connected-realm/{0}/mythic-leaderboard/?namespace=dynamic-eu&locale=en_GB&access_token={1}'\
             .format(
                 realm_id,
-                cfg.BNET_ACCESS_TOKEN
+                BlizzardRoutes.token
             )
 
 
@@ -66,8 +68,3 @@ class RaiderIORoutes():
                 realm,
                 character_name
             )
-
-
-blizzard = BlizzardRoutes(cfg.BNET_ACCESS_TOKEN, cfg.BNET_API_KEY)
-raider_io = RaiderIORoutes()
-

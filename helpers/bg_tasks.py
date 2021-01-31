@@ -2,13 +2,14 @@ import discord
 
 from helpers import util as u
 from helpers.db_manager import DBManager
+import datetime
 
 
 async def guild_sub_sending(bot):
     """Requests guild roster from BNet API every minute
     and compares it with a previously saved roster
     then works out if any changes happened"""
-    db_manager = DBManager()
+    db_manager = bot.dbm
     # Retrieve all members from DB and put them in a list
     subs = [doc async for doc in db_manager.db_guild['guild_member_subs'].find({})]
     update_these = []
@@ -76,3 +77,87 @@ async def guild_sub_sending(bot):
             realm_name = sub[0]
             current_guild_roster_full = await u.get_guild_roster(realm_name, guild_name)
             await db_manager.update_guild_db(guild_name, realm_name, current_guild_roster_full)
+
+    async def new_atb_apps(bot):
+        dbm = DBManager()
+        guild = bot.get_guild(198869638568869888)
+        officer_channel = bot.get_channel(502274247788462082)
+        test_channel = bot.get_channel(509555856816340993)
+
+        apps = dbm.apps_new.find().sort([('_id', -1)])  # Reverse Sort
+        apps = await apps.to_list(100)
+        if apps:
+            for app in apps:
+                embed = discord.Embed(
+                    title=' ',
+                    description=' ',
+                    color=u.color_pick(2000)
+                )
+                # Set requested run as author so we can put a pretty little icon
+                embed.set_author(
+                    name='Nova prijava: {} ({})'.format(app['personal_name'], app['yob']),
+                    icon_url='https://cdn0.iconfinder.com/data/icons/large-weather-icons/256/Heat.png'
+                )
+
+                embed.add_field(
+                    name='Reci nam nesto o sebi',
+                    value='```{}```'.format(
+                        app['personal_other'][:1018] if app['personal_other'] else '<Nista nije uneto>'),
+                    inline=False
+                )
+
+                embed.add_field(
+                    name='Ime maina i spec',
+                    value='{} ({})'.format(app['main_name'] if app['main_name'] else '<Nista nije uneto>',
+                                           app['class_and_spec'] if app['class_and_spec'] else '<Nista nije uneto>'),
+                    inline=True
+                )
+
+                embed.add_field(
+                    name='Armory Link',
+                    value=app['armory_url'] if app['armory_url'] else '<Nista nije uneto>',
+                    inline=False
+                )
+
+                embed.add_field(
+                    name='UI Link',
+                    value=app['ui_screenshot_url'] if app['ui_screenshot_url'] else '<Nista nije uneto>',
+                    inline=False
+                )
+
+                embed.add_field(
+                    name='Konfiguracija kompa',
+                    value='```{}```'.format(app['pc_config'][:1018] if app['pc_config'] else '<Nista nije uneto>'),
+                    inline=True
+                )
+
+                embed.add_field(
+                    name='Mikrofon',
+                    value='Da' if app['microphone'] == 'true' else 'Ne',
+                    inline=False
+                )
+
+                embed.add_field(
+                    name='Raid iskustvo',
+                    value='```{}```'.format(app['game_other'][:1018] if app['game_other'] else '<Nista nije uneto>'),
+                    inline=False
+                )
+
+                embed.add_field(
+                    name='Kontakt',
+                    value=app['contact_info'] if app['contact_info'] else '<Nista nije uneto>',
+                    inline=False
+                )
+
+                embed.set_footer(
+                    text='Aplikacija popunjena {}'.format(
+                        datetime.utcfromtimestamp(app['created_at']).strftime('%Y-%m-%d %H:%M:%S')
+                    ),
+                )
+
+                await test_channel.send(embed=embed)
+                app.pop('_id', None)
+                print(app)
+
+            await dbm.apps_old.insert_many(apps)
+            await dbm.apps_new.delete_many({})

@@ -1,7 +1,6 @@
 import aiohttp
 import yarl
 import json
-from helpers import cfg
 
 emojis = {
     'goldcoins': '<:goldcoins:487736737485946880>',
@@ -21,22 +20,22 @@ async def get_json(uri, timeout=60):
             return json.loads(await json_request.text())
 
 
-async def get_guild_roster(realm_name, guild_name):
-    guild_name = guild_name.replace(' ', '%20')
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-                'https://eu.api.battle.net/wow/guild/{0}/{1}?fields=members&locale=en_GB&apikey={2}'
-                .format(
-                    realm_name,
-                    guild_name,
-                    cfg.BNET_API_KEY
-                ), timeout=15
-        ) as guild_req:
-            guild = json.loads(await guild_req.text())
-            if guild_req.status == 404:
-                print('Guild not found')
-                return 404, 'Not Found'
-            return guild['members']
+# async def get_guild_roster(realm_name, guild_name):
+#     guild_name = guild_name.replace(' ', '%20')
+#     async with aiohttp.ClientSession() as session:
+#         async with session.get(
+#                 'https://eu.api.battle.net/wow/guild/{0}/{1}?fields=members&locale=en_GB&apikey={2}'
+#                 .format(
+#                     realm_name,
+#                     guild_name,
+#                     cfg.BNET_API_KEY
+#                 ), timeout=15
+#         ) as guild_req:
+#             guild = json.loads(await guild_req.text())
+#             if guild_req.status == 404:
+#                 print('Guild not found')
+#                 return 404, 'Not Found'
+#             return guild['members']
 
 
 def color_pick(score):

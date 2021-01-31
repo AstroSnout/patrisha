@@ -6,10 +6,9 @@ from helpers import util as u
 from helpers.db_manager import DBManager
 
 
-class Administration:
+class Administration(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.dbm = DBManager()
 
     async def _delete_messages(self, ctx, messages):
         if len(messages) > 100:
@@ -38,16 +37,16 @@ class Administration:
 
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    @commands.command(name='on_join')
+    @commands.command(name='onjoin')
     async def on_join_message(self, ctx, *, message):
-        await self.dbm.modify_on_join_message(message, ctx.channel.guild)
+        await self.bot.dbm.set_on_join_message(ctx.channel.guild, message)
         await ctx.send('Updated this guild\'s on join message!')
 
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    @commands.command(name='default_role')
+    @commands.command(name='defaultrole')
     async def on_join_role(self, ctx, *, role_name):
-        status = await self.dbm.modify_on_join_role(role_name, ctx.channel.guild)
+        status = await self.bot.dbm.set_on_join_role(ctx.channel.guild, role_name)
         print(role_name)
         if status:  # Success
             await ctx.send('Updated this guild\'s on join role!')
@@ -74,7 +73,7 @@ class Administration:
         # Call a different function based on kwargs
 
         try:
-            amount = int(args[0]) + 1  # added one since we're ignoring the invocation
+            amount = int(args[0])  # added one since we're ignoring the invocation
         except ValueError:
             await ctx.invoke(self.bot.get_command('help'), 'a', 'p')
             return
@@ -112,7 +111,7 @@ class Administration:
         # No -m modifier
         else:
             messages = [
-                msg async for msg in ctx.channel.history(limit=amount, reverse=True)
+                msg async for msg in ctx.channel.history(limit=amount)
                 if msg.author.id == user or msg.author.name.lower() == user or user is None
             ]
 

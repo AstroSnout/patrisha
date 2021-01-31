@@ -1,9 +1,9 @@
-from discord.ext.commands import HelpFormatter, Paginator, Command
+from discord.ext.commands import HelpCommand, Paginator, Command
 import itertools
 import asyncio
 
 
-class Helper(HelpFormatter):
+class Helper(HelpCommand):
     def __init__(self):
         super(Helper, self).__init__()
         self.category = ''

@@ -3,7 +3,7 @@ from discord.ext import commands
 from helpers import util
 
 
-class Stats:
+class Stats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

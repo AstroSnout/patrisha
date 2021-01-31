@@ -2,7 +2,7 @@ from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 
 
-class Misc:
+class Misc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -15,7 +15,10 @@ class Misc:
     @commands.cooldown(rate=1, per=300, type=BucketType.user)
     async def feedback(self, ctx, *, feedback):
         print(f'{ctx.message.author} has sent us some feedback')
-        await self.bot.get_user(217294231125884929).send(f'User {ctx.message.author} sent feedback:\n```{feedback}```')
+        feedback_channel = self.bot.get_channel(805436184330895383)
+        await feedback_channel.send(
+            f'User {ctx.message.author.mention} sent feedback:\n```{feedback}```'
+        )
 
 
 def setup(bot):
