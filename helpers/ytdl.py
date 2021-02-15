@@ -40,7 +40,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.url = data.get('url')
 
     @classmethod
-    async def get_playable_song(cls, url, *, loop=None, stream=True):
+    async def get_playable_song(cls, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: YTDLDownloader.client.extract_info(url, download=not stream))
         if 'entries' in data:

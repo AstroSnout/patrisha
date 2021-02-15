@@ -154,6 +154,7 @@ class GameWow(commands.Cog):
             recent_runs = character_data['mythic_plus_recent_runs']
             role = max(character_data['mythic_plus_scores'].items(), key=operator.itemgetter(1))[0]  # Role with best score
             # Request top dungeon runs (currently the r.io API only returns the top 3)
+            print(f'{char_name}/{realm}/{region}')
             character = await u.get_json(
                 routes.RaiderIORoutes.character_profile(char_name, realm, region)
             )
@@ -172,7 +173,7 @@ class GameWow(commands.Cog):
                 icon_url=self.role_icons[role]
             )
             # Set their mythic plus score field to the obtained value
-            embed.add_field(name='Mythic+ Score:', value='({} points)'.format(m_score_total), inline=True)
+            embed.add_field(name='Mythic+ Score:', value='{} points'.format(m_score_total), inline=True)
             # Show their equipped itemlevel
             embed.add_field(name='Equipped iLvl:', value=character_data['gear']['item_level_equipped'], inline=True)
             # Assign new variable for increased readability
